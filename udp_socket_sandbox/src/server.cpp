@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <string>
 
 int main(void){
     int socket_desc;
@@ -15,7 +16,7 @@ int main(void){
     memset(client_message, '\0', sizeof(client_message));
     
     // Create UDP socket:
-    socket_desc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    socket_desc = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
     
     if(socket_desc < 0){
         printf("Error while creating socket\n");
@@ -37,24 +38,41 @@ int main(void){
     
     printf("Listening for incoming messages...\n\n");
     
-    // Receive client's message:
-    if (recvfrom(socket_desc, client_message, sizeof(client_message), 0,
-         (struct sockaddr*)&client_addr, &client_struct_length) < 0){
-        printf("Couldn't receive\n");
-        return -1;
-    }
-    printf("Received message from IP: %s and port: %i\n",
-           inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-    
-    printf("Msg from client: %s\n", client_message);
-    
-    // Respond to client:
-    strcpy(server_message, client_message);
-    
-    if (sendto(socket_desc, server_message, strlen(server_message), 0,
-         (struct sockaddr*)&client_addr, client_struct_length) < 0){
-        printf("Can't send\n");
-        return -1;
+    bool keepRunning = true;
+    int counter = 0;
+    bool first_print = true;
+    int FLAG = MSG_PEEK;
+    while(keepRunning) {
+
+        // Receive client's message:
+        if (recvfrom(socket_desc, 
+                    client_message, 
+                    sizeof(client_message), 
+                    FLAG,
+                    (struct sockaddr*)&client_addr, 
+                    &client_struct_length) < 0){
+            printf("Couldn't receive\n");
+        }
+
+        FLAG = MSG_PEEK;
+        if (counter % 5 == 0) FLAG = 0;
+
+        if (first_print) {
+            printf("Received message from IP: %s and port: %i\n",
+                inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+            
+            first_print = false;
+        }
+        
+        printf("Msg from client: %s\n", client_message);
+
+        sleep(1);
+
+        memset(client_message, '\0', sizeof(client_message));
+
+        counter++;
+
+
     }
     
     // Close the socket:
