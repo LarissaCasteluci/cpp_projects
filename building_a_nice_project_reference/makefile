@@ -1,14 +1,35 @@
-BIN := bin
-SRC := src
-INCLUDE := include
-INCLUDE := $(addprefix -I, ${INCLUDE})
-LIBS := -lpthread -lrt
+# ------------------------------------------------
+# Generic Makefile
+# ------------------------------------------------
 
-targets: all
+# project name (generate executable with this name)
+TARGET   = project
 
-all: main.cpp
-	mkdir -p ${BIN}
-	g++ -g -o ${BIN}/binary.exe ${BIN}/main.cpp ${INCLUDE} ${LIBS}
+CXX    = g++
+CXXFLAGS   = -g -std=c++11 -lrt -O0
 
+SRCDIR   = src
+OBJDIR   = obj
+BINDIR   = bin
+
+SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
+INCLUDES := $(wildcard $(SRCDIR)/*.hh)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+
+INC = include interfaces
+ALL_INCLUDES = $(addprefix -I, $(INC))
+#ALL_INCLUDES += INCLUDES
+
+default: $(BINDIR)/$(TARGET)
+
+#COMPILING
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
+	@$(CXX) $(ALL_INCLUDES) $(CXXFLAGS) -c $< -o $@
+
+#LINKING
+$(BINDIR)/$(TARGET): $(OBJECTS)
+	@$(CXX) $(ALL_INCLUDES) $(OBJECTS) $(CXXFLAGS) -o $@
+
+.PHONY: clean
 clean:
-	rm -f ${BIN}/main.exe 
+	rm -rf $(OBJECTS) $(BINDIR)/$(TARGET)
