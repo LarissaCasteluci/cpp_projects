@@ -1,0 +1,34 @@
+@startuml
+
+folder src {
+}
+
+folder components {
+}
+
+folder x{
+}
+
+artifact "ooo.xml" {
+}
+folder a {
+}
+artifact b {
+}
+artifact c {
+}
+artifact d {
+}
+artifact e {
+}
+
+src -- components 
+components -- x
+x-r- d
+d -d-e
+x -d--- a
+a -r- b
+b -d- c
+c -d- [ooo.xml]
+
+@enduml
