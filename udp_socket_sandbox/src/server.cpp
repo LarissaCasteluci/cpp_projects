@@ -41,7 +41,7 @@ int main(void){
     bool keepRunning = true;
     int counter = 0;
     bool first_print = true;
-    int FLAG = MSG_PEEK;
+    int FLAG = 0;
     while(keepRunning) {
 
         // Receive client's message:
@@ -69,6 +69,7 @@ int main(void){
         sleep(1);
 
         memset(client_message, '\0', sizeof(client_message));
+        printf("Just cleared memory: %s\n", client_message);
 
         counter++;
 

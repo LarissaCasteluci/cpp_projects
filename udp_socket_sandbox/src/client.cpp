@@ -45,7 +45,7 @@ int main(void){
         }    
         counter++;
 
-        sleep(2);
+        sleep(4);
     }
 
     // Close the socket:
