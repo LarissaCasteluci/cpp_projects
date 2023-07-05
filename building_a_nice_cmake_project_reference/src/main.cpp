@@ -1,3 +1,8 @@
+// @brief Main file!
+
+#include "function.h"
+
 int main (){
-    return 0;
+	print_it();
+    	return 0;
 }
